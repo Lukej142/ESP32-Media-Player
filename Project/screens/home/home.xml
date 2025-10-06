@@ -1,0 +1,13 @@
+<screen permanent="true">
+    <styles>
+        <style name="cell" border_side="full"/>
+    </styles>
+
+    <view>
+        <lv_table column_count="2" row_count="2" style_border_side="full">
+            <style name="cell"/>
+            <lv_table-cell column="0" row="0" value="0"/>
+        </lv_table>
+    </view>
+
+</screen>

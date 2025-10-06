@@ -1,0 +1,21 @@
+<screen>
+   <view style_pad_hor="5" style_pad_top="5" scrollable="false">
+        <title text="Gain" align="top_left"/>
+
+        <column height="100%" width="100%" y="25">
+            <lv_checkbox text="Check" bind_checked="check"></lv_checkbox>
+            <lv_slider bind_value="arc1">
+                <event_cb callback="slider_changed" trigger="value_changed"/>
+            </lv_slider>
+            <lv_label text="asd"></lv_label>
+        </column>
+
+        <lv_button style_align="bottom_mid" style_text_font="font_subtitle" align="top_right">
+            <lv_label text-translated="back"/>
+            <screen_load_event screen="home"/> 
+        </lv_button>
+        <arc align="bottom_left" ></arc>
+        <arc variable="arc2" align="bottom_right"></arc>
+        
+   </view>
+</screen>

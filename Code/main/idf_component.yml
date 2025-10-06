@@ -1,0 +1,6 @@
+dependencies:
+  protocol_examples_common:
+    path: ${IDF_PATH}/examples/common_components/protocol_examples_common
+  lvgl/lvgl: ^9.3.0
+  espressif/esp_lvgl_port: ^2.6.2
+  espressif/json_parser: ^1.0.3
