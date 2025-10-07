@@ -38,17 +38,20 @@ static esp_err_t root_get_handler(httpd_req_t *req)
     char id_preview[10];
     strncpy(id_preview, id, 10);
 
+    char secret_preview[10];
+    strncpy(secret_preview, id, 10);
+
     snprintf(resp, sizeof(resp),
              "<html><body>"
              "<h2>Music Controller Configuration</h2>"
              "<form action=\"/save\" method=\"post\">"
-             "Refresh Token: <input name=\"Refresh Token\" value=\"%s\"><br>"
+             "Refresh Token: <input name=\"Refresh Token\" placeholder=\"%s\"><br>"
              "<input type=\"submit\" value=\"Save Refresh Token\">"
              "</form>"
              "<form action=\"/save\" method=\"post\">"
-             "Please Base 64 encode your ID and secret in the form ID:Secret<br>"
-             "ClientID:ClientSecret: <input name=\"ID\" value=\"%s\"><br>"
-             "<input type=\"submit\" value=\"Save ID:Secret\">"
+             "Client ID: <input name=\"ID\" placeholder=\"%s\"><br>"
+             "Client Secret: <input name=\"Secret\" placeholder=\"%s\"><br>"
+             "<input type=\"submit\" value=\"Save ID & Secret\">"
              "</form>"
              "<form action=\"/saveWiFi\" method=\"post\">"
              "Current WiFi: %s<br>"
@@ -57,7 +60,7 @@ static esp_err_t root_get_handler(httpd_req_t *req)
              "</select>"
              "<button type=\"button\" onclick=\"fetchScan()\">Scan Networks</button><br>"
              "Password: <input name=\"Password\" value=\"\"><br><br>"
-             "<input type=\"submit\" value=\"Save WiFi\">"
+             "<input type=\"submit\" value=\"Save WiFi (empty to clear)\">"
              "</form>"
              "<script>"
              "function fetchScan(){"
@@ -71,7 +74,7 @@ static esp_err_t root_get_handler(httpd_req_t *req)
              "}"
              "</script>"
              "</body></html>",
-             refresh_preview, id_preview, ssid);
+             refresh_preview, id_preview, secret_preview, ssid);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     return ESP_OK;
@@ -178,6 +181,11 @@ static esp_err_t save_post_handler(httpd_req_t *req)
             strncpy(id, token + 3, sizeof(id));
             save(ID, id);
         }
+        else if (strncmp(token, "Secret", 2) == 0)
+        {
+            strncpy(secret, token + 3, sizeof(id));
+            save(SECRET, secret);
+        }
         token = strtok(NULL, "&");
     }
 
@@ -196,7 +204,7 @@ static const httpd_uri_t scan_uri = {
     .method = HTTP_GET,
     .handler = wifi_scan_handler};
 
-static const httpd_uri_t save_token_uri = {
+static const httpd_uri_t save_uri = {
     .uri = "/save",
     .method = HTTP_POST,
     .handler = save_post_handler,
@@ -228,7 +236,7 @@ static httpd_handle_t start_webserver(void)
     ESP_LOGI(WEB, "Registering URI handlers");
     httpd_register_uri_handler(server, &root);
     httpd_register_uri_handler(server, &scan_uri);
-    httpd_register_uri_handler(server, &save_token_uri);
+    httpd_register_uri_handler(server, &save_uri);
     httpd_register_uri_handler(server, &save_WiFi_uri);
     return server;
 }

@@ -13,9 +13,11 @@ extern const char *API_TOKEN;
 extern const char *SSID;
 extern const char *PASSWORD;
 extern const char *ID;
+extern const char *SECRET;
 
 extern char refresh_token[275];
 extern char id[128];
+extern char secret[128];
 extern char token[275];
 extern char ssid[33];
 extern char password[32];

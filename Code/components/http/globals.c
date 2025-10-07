@@ -8,9 +8,11 @@ const char *API_TOKEN = "API Token";
 const char *SSID = "SSID";
 const char *PASSWORD = "PASSWORD";
 const char *ID = "ID";
+const char *SECRET = "SECRET";
 
 char refresh_token[275];
 char id[128];
+char secret[128];
 char token[275];
 char ssid[33];
 char password[32];
