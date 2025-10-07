@@ -40,7 +40,11 @@
     "esp_event.h": "c",
     "esp_wifi.h": "c",
     "http.h": "c",
-    "text_encoding": "c"
+    "text_encoding": "c",
+    "esp_http_client.h": "c",
+    "socket.h": "c",
+    "sockets.h": "c",
+    "freertos.h": "c"
   },
   "idf.flashType": "UART"
 }
