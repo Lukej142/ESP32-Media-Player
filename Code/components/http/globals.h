@@ -1,108 +1,27 @@
+#ifndef GLOBALS
+#define GLOBALS
+
 #include <esp_log.h>
 #include <nvs_flash.h>
 #include "sdkconfig.h"
 
-#include "esp_netif.h"
-#include <esp_http_server.h>
-#include "esp_wifi.h"
+extern const char *WEB;
+extern const char *TOKEN;
 
-static const char *WEB = "WEB";
-static const char *TOKEN = "TOKEN";
+extern const char *REFRESH_TOKEN;
+extern const char *API_TOKEN;
+extern const char *SSID;
+extern const char *PASSWORD;
 
-const char *REFRESH_TOKEN = "Refresh Token";
-const char *API_TOKEN = "API Token";
-const char *SSID = "SSID";
-const char *PASSWORD = "PASSWORD";
+extern char refresh_token[275];
+extern char token[275];
+extern char ssid[33];
+extern char password[32];
 
-char refresh_token[275];
-char token[275];
-char ssid[33];
-char password[32];
+void saveWiFi();
+int readWiFi();
 
-void saveWiFi()
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(WEB, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return;
-    }
-    if (nvs_set_str(my_handle, SSID, ssid) != ESP_OK)
-        ESP_LOGE(WEB, "Failed to write ssid\n");
-    if (nvs_set_str(my_handle, PASSWORD, password) != ESP_OK)
-        ESP_LOGE(WEB, "Failed to write password\n");
-    err = nvs_commit(my_handle);
-    if (err != ESP_OK)
-        ESP_LOGE(WEB, "Failed to commit NVS changes!");
-    nvs_close(my_handle);
+void saveToken();
+int readToken();
 
-    printf("SSID: %s, Password: %s\n", ssid, password);
-}
-
-int readWiFi()
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(WEB, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return 1;
-    }
-    size_t size = sizeof(ssid);
-    if (nvs_get_str(my_handle, SSID, ssid, &size) != ESP_OK)
-    {
-        ESP_LOGE(WEB, "Failed to read ssid\n");
-        return 1;
-    }
-    size = sizeof(password);
-    if (nvs_get_str(my_handle, PASSWORD, password, &size) != ESP_OK)
-    {
-        ESP_LOGE(WEB, "Failed to read password\n");
-        return 1;
-    }
-    nvs_close(my_handle);
-
-    printf("SSID: %s, Password: %s\n", ssid, password);
-    return 0;
-}
-
-void saveToken()
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return;
-    }
-    if (nvs_set_str(my_handle, REFRESH_TOKEN, refresh_token) != ESP_OK)
-        ESP_LOGE(TOKEN, "Failed to write\n");
-    err = nvs_commit(my_handle);
-    if (err != ESP_OK)
-        ESP_LOGE(TOKEN, "Failed to commit NVS changes!");
-    nvs_close(my_handle);
-
-    printf("Refresh Token: %s\n", refresh_token);
-}
-
-int readToken()
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        return 1;
-    }
-    size_t size = sizeof(ssid);
-    if (nvs_get_str(my_handle, REFRESH_TOKEN, refresh_token, &size) != ESP_OK)
-    {
-        ESP_LOGE(TOKEN, "Failed to read ssid\n");
-        return 1;
-    }
-    nvs_close(my_handle);
-
-    printf("Refresh Token: %s\n", refresh_token);
-    return 0;
-}
+#endif // GLOBALS

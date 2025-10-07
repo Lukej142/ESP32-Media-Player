@@ -12,7 +12,6 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 
-#include "globals.h"
 #include "http.h"
 
 void app_main(void)
