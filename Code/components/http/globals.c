@@ -1,14 +1,16 @@
-#include <esp_log.h>
+#include "globals.h"
 
-static const char *WEB = "WEB";
-static const char *TOKEN = "TOKEN";
+const char *WEB = "WEB";
+const char *TOKEN = "TOKEN";
 
 const char *REFRESH_TOKEN = "Refresh Token";
 const char *API_TOKEN = "API Token";
 const char *SSID = "SSID";
 const char *PASSWORD = "PASSWORD";
+const char *ID = "ID";
 
 char refresh_token[275];
+char id[128];
 char token[275];
 char ssid[33];
 char password[32];
@@ -61,7 +63,7 @@ int readWiFi()
     return 0;
 }
 
-void saveToken()
+void save(const char *name, const char *dest)
 {
     nvs_handle_t my_handle;
     esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
@@ -70,7 +72,7 @@ void saveToken()
         ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
         return;
     }
-    if (nvs_set_str(my_handle, REFRESH_TOKEN, refresh_token) != ESP_OK)
+    if (nvs_set_str(my_handle, name, dest) != ESP_OK)
         ESP_LOGE(TOKEN, "Failed to write\n");
     err = nvs_commit(my_handle);
     if (err != ESP_OK)
@@ -80,7 +82,7 @@ void saveToken()
     printf("Refresh Token: %s\n", refresh_token);
 }
 
-int readToken()
+int read(const char *name, const char *dest)
 {
     nvs_handle_t my_handle;
     esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
@@ -89,8 +91,8 @@ int readToken()
         ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
         return 1;
     }
-    size_t size = sizeof(ssid);
-    if (nvs_get_str(my_handle, REFRESH_TOKEN, refresh_token, &size) != ESP_OK)
+    size_t size = sizeof(dest);
+    if (nvs_get_str(my_handle, name, dest, &size) != ESP_OK)
     {
         ESP_LOGE(TOKEN, "Failed to read ssid\n");
         return 1;

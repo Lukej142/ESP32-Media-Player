@@ -7,19 +7,17 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <esp_wifi.h>
 #include <esp_event.h>
 #include <esp_system.h>
-#include <nvs_flash.h>
 #include <sys/param.h>
-#include "esp_netif.h"
 
-#include <esp_http_server.h>
-#include "esp_tls.h"
-#include "sdkconfig.h"
 #include "esp_heap_caps.h"
 
-#include "globals.h"
+#include <esp_netif.h>
+#include <esp_http_server.h>
+#include <esp_wifi.h>
+
+#include "http.h"
 
 /*
  * Web server for authentication
@@ -29,20 +27,6 @@
 #define ESP_WIFI_CHANNEL 1
 #define MAX_STA_CONN 1
 
-/* Event handler for catching system events */
-static void event_handler(void *arg, esp_event_base_t event_base,
-                          int32_t event_id, void *event_data)
-{
-    if (event_base == ESP_HTTP_SERVER_EVENT)
-    {
-        if (event_id == HTTP_SERVER_EVENT_ERROR)
-        {
-            esp_tls_last_error_t *last_error = (esp_tls_last_error_t *)event_data;
-            ESP_LOGE(WEB, "Error event triggered: last_error = %s, last_tls_err = %d, tls_flag = %d", esp_err_to_name(last_error->last_error), last_error->esp_tls_error_code, last_error->esp_tls_flags);
-        }
-    }
-}
-
 /* HTTP GET handler */
 static esp_err_t root_get_handler(httpd_req_t *req)
 {
@@ -51,12 +35,20 @@ static esp_err_t root_get_handler(httpd_req_t *req)
     char refresh_preview[10];
     strncpy(refresh_preview, refresh_token, 10);
 
+    char id_preview[10];
+    strncpy(id_preview, id, 10);
+
     snprintf(resp, sizeof(resp),
              "<html><body>"
              "<h2>Music Controller Configuration</h2>"
-             "<form action=\"/saveToken\" method=\"post\">"
+             "<form action=\"/save\" method=\"post\">"
              "Refresh Token: <input name=\"Refresh Token\" value=\"%s\"><br>"
              "<input type=\"submit\" value=\"Save Refresh Token\">"
+             "</form>"
+             "<form action=\"/save\" method=\"post\">"
+             "Please Base 64 encode your ID and secret in the form ID:Secret<br>"
+             "ClientID:ClientSecret: <input name=\"ID\" value=\"%s\"><br>"
+             "<input type=\"submit\" value=\"Save ID:Secret\">"
              "</form>"
              "<form action=\"/saveWiFi\" method=\"post\">"
              "Current WiFi: %s<br>"
@@ -79,7 +71,7 @@ static esp_err_t root_get_handler(httpd_req_t *req)
              "}"
              "</script>"
              "</body></html>",
-             refresh_preview, ssid);
+             refresh_preview, id_preview, ssid);
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     return ESP_OK;
@@ -158,7 +150,7 @@ static esp_err_t save_WiFi_post_handler(httpd_req_t *req)
 }
 
 /* Token POST handler */
-static esp_err_t save_token_post_handler(httpd_req_t *req)
+static esp_err_t save_post_handler(httpd_req_t *req)
 {
     char buf[350];
     int remaining = req->content_len;
@@ -173,10 +165,21 @@ static esp_err_t save_token_post_handler(httpd_req_t *req)
     buf[received] = '\0';
 
     // Example form body: f1=abc&f2=def&f3=ghi&f4=jkl
-    if (strncmp(buf, "Refresh Token", 3) == 0)
-        strncpy(refresh_token, buf + 14, sizeof(refresh_token));
-
-    saveToken();
+    char *token = strtok(buf, "&");
+    while (token != NULL)
+    {
+        if (strncmp(token, "Refresh Token", 3) == 0)
+        {
+            strncpy(refresh_token, token + 14, sizeof(refresh_token));
+            save(REFRESH_TOKEN, refresh_token);
+        }
+        else if (strncmp(token, "ID", 2) == 0)
+        {
+            strncpy(id, token + 3, sizeof(id));
+            save(ID, id);
+        }
+        token = strtok(NULL, "&");
+    }
 
     const char *resp = "<html><body><h3>Saved Token!</h3><a href=\"/\">Go back</a></body></html>";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -194,9 +197,9 @@ static const httpd_uri_t scan_uri = {
     .handler = wifi_scan_handler};
 
 static const httpd_uri_t save_token_uri = {
-    .uri = "/saveToken",
+    .uri = "/save",
     .method = HTTP_POST,
-    .handler = save_token_post_handler,
+    .handler = save_post_handler,
     .user_ctx = NULL};
 
 static const httpd_uri_t save_WiFi_uri = {
@@ -310,7 +313,7 @@ static void connectWiFi()
         setupAP();
 }
 
-void app_main(void)
+void setupWiFi()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
