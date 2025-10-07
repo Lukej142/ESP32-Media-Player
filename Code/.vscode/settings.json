@@ -36,7 +36,10 @@
     "nvs_flash.h": "c",
     "esp_log.h": "c",
     "stdint.h": "c",
-    "stdarg.h": "c"
+    "stdarg.h": "c",
+    "esp_event.h": "c",
+    "esp_wifi.h": "c",
+    "http.h": "c"
   },
   "idf.flashType": "UART"
 }

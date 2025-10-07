@@ -1,4 +1,10 @@
 #include <esp_log.h>
+#include <nvs_flash.h>
+#include "sdkconfig.h"
+
+#include "esp_netif.h"
+#include <esp_http_server.h>
+#include "esp_wifi.h"
 
 static const char *WEB = "WEB";
 static const char *TOKEN = "TOKEN";

@@ -7,19 +7,13 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <esp_wifi.h>
 #include <esp_event.h>
 #include <esp_system.h>
-#include <nvs_flash.h>
 #include <sys/param.h>
-#include "esp_netif.h"
 
-#include <esp_http_server.h>
-#include "esp_tls.h"
-#include "sdkconfig.h"
 #include "esp_heap_caps.h"
 
-#include "globals.h"
+#include "http.h"
 
 /*
  * Web server for authentication
@@ -28,20 +22,6 @@
 #define AP_SSID "Music Hub"
 #define ESP_WIFI_CHANNEL 1
 #define MAX_STA_CONN 1
-
-/* Event handler for catching system events */
-static void event_handler(void *arg, esp_event_base_t event_base,
-                          int32_t event_id, void *event_data)
-{
-    if (event_base == ESP_HTTP_SERVER_EVENT)
-    {
-        if (event_id == HTTP_SERVER_EVENT_ERROR)
-        {
-            esp_tls_last_error_t *last_error = (esp_tls_last_error_t *)event_data;
-            ESP_LOGE(WEB, "Error event triggered: last_error = %s, last_tls_err = %d, tls_flag = %d", esp_err_to_name(last_error->last_error), last_error->esp_tls_error_code, last_error->esp_tls_flags);
-        }
-    }
-}
 
 /* HTTP GET handler */
 static esp_err_t root_get_handler(httpd_req_t *req)
@@ -310,7 +290,7 @@ static void connectWiFi()
         setupAP();
 }
 
-void app_main(void)
+void setupWiFi()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
