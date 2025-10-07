@@ -33,7 +33,10 @@
     "thread": "c",
     "esp_log_level.h": "c",
     "esp_system.h": "c",
-    "nvs_flash.h": "c"
+    "nvs_flash.h": "c",
+    "esp_log.h": "c",
+    "stdint.h": "c",
+    "stdarg.h": "c"
   },
   "idf.flashType": "UART"
 }
