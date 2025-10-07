@@ -1,34 +1,102 @@
+#include <esp_log.h>
+
+static const char *WEB = "WEB";
+static const char *TOKEN = "TOKEN";
 
 const char *REFRESH_TOKEN = "Refresh Token";
-const char *TOKEN = "Token";
+const char *API_TOKEN = "API Token";
 const char *SSID = "SSID";
 const char *PASSWORD = "PASSWORD";
 
 char refresh_token[275];
 char token[275];
-char ssid[20];
-char password[20];
+char ssid[33];
+char password[32];
 
-__attribute__((weak)) void setRefresh(char *new_refresh)
+void saveWiFi()
 {
-    *refresh_token = new_refresh;
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(WEB, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        return;
+    }
+    if (nvs_set_str(my_handle, SSID, ssid) != ESP_OK)
+        ESP_LOGE(WEB, "Failed to write ssid\n");
+    if (nvs_set_str(my_handle, PASSWORD, password) != ESP_OK)
+        ESP_LOGE(WEB, "Failed to write password\n");
+    err = nvs_commit(my_handle);
+    if (err != ESP_OK)
+        ESP_LOGE(WEB, "Failed to commit NVS changes!");
+    nvs_close(my_handle);
+
+    printf("SSID: %s, Password: %s\n", ssid, password);
 }
 
-__attribute__((weak)) void setToken(char *new_token)
+int readWiFi()
 {
-    *token = new_token;
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(WEB, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        return 1;
+    }
+    size_t size = sizeof(ssid);
+    if (nvs_get_str(my_handle, SSID, ssid, &size) != ESP_OK)
+    {
+        ESP_LOGE(WEB, "Failed to read ssid\n");
+        return 1;
+    }
+    size = sizeof(password);
+    if (nvs_get_str(my_handle, PASSWORD, password, &size) != ESP_OK)
+    {
+        ESP_LOGE(WEB, "Failed to read password\n");
+        return 1;
+    }
+    nvs_close(my_handle);
+
+    printf("SSID: %s, Password: %s\n", ssid, password);
+    return 0;
 }
 
-__attribute__((weak)) void setRefresh(char *new_ssid)
+void saveToken()
 {
-    *ssid = new_ssid;
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        return;
+    }
+    if (nvs_set_str(my_handle, REFRESH_TOKEN, refresh_token) != ESP_OK)
+        ESP_LOGE(TOKEN, "Failed to write\n");
+    err = nvs_commit(my_handle);
+    if (err != ESP_OK)
+        ESP_LOGE(TOKEN, "Failed to commit NVS changes!");
+    nvs_close(my_handle);
+
+    printf("Refresh Token: %s\n", refresh_token);
 }
 
-__attribute__((weak)) void setRefresh(char *new_password)
+int readToken()
 {
-    *password = new_password;
-}
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TOKEN, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        return 1;
+    }
+    size_t size = sizeof(ssid);
+    if (nvs_get_str(my_handle, REFRESH_TOKEN, refresh_token, &size) != ESP_OK)
+    {
+        ESP_LOGE(TOKEN, "Failed to read ssid\n");
+        return 1;
+    }
+    nvs_close(my_handle);
 
-void saveAll()
-{
+    printf("Refresh Token: %s\n", refresh_token);
+    return 0;
 }

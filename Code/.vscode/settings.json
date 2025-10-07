@@ -5,7 +5,7 @@
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
   ],
-  "idf.portWin": "COM6",
+  "idf.portWin": "COM16",
   "idf.toolsPathWin": "C:\\Users\\lukej\\.espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
@@ -22,6 +22,18 @@
     "sdkconfig.h": "c",
     "esp_http_server.h": "c",
     "bitset": "c",
-    "regex": "c"
-  }
+    "regex": "c",
+    "esp_eth.h": "c",
+    "esp_tls.h": "c",
+    "param.h": "c",
+    "esp_netif.h": "c",
+    "globals.h": "c",
+    "esp_heap_caps.h": "c",
+    "format": "c",
+    "thread": "c",
+    "esp_log_level.h": "c",
+    "esp_system.h": "c",
+    "nvs_flash.h": "c"
+  },
+  "idf.flashType": "UART"
 }
