@@ -39,7 +39,8 @@
     "stdarg.h": "c",
     "esp_event.h": "c",
     "esp_wifi.h": "c",
-    "http.h": "c"
+    "http.h": "c",
+    "text_encoding": "c"
   },
   "idf.flashType": "UART"
 }
